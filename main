@@ -1,0 +1,271 @@
+//Program by George Zhang
+//Lab 3 - Menu driven program
+
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <string>
+
+using namespace std;
+
+const int numofplayers = 10;
+
+struct basketball
+{
+	string firstname;
+	string lastname;
+	string team;
+	double ppg;
+	double apg;
+	double rpg;
+}x[10];
+
+void readin (ifstream& infile, basketball x[]);
+void menu ();
+void printall ();
+void players ();
+void printone (int z);
+void output (ofstream& outfile);
+void terminate(ofstream& outfile);
+void teamsearch ();
+void update ();
+
+int main()
+{
+	ifstream infile;
+	ofstream outfile;
+	int choice=0;
+
+	infile.open("stats.txt");
+	outfile.open("savestats.txt");
+
+	readin (infile, x);
+
+do
+{
+	menu();
+	cin >> choice;
+
+	switch (choice)
+	{
+	case 1:
+		printall();
+		break;
+	case 2:
+		players();
+		break;
+	case 3:
+		teamsearch();
+		break;
+	case 4:
+		update();
+		break;
+	case 5:
+		terminate(outfile);
+		break;
+	} // end switch
+} // end do
+while (choice !=5);
+
+infile.close();
+outfile.close();
+
+return 0;
+} //end main
+
+void readin (ifstream& infile, basketball x[])
+{
+	//Reads in basketball players and their statistics from a file
+	int i=0;
+
+	infile >> x[i].firstname >> x[i].lastname >> x[i].team >> x[i].ppg >> x[i].apg >> x[i].rpg;
+	i++;
+	//numofplayers++;
+
+	while (!infile.eof())
+	{
+		infile >> x[i].firstname >> x[i].lastname >> x[i].team >> x[i].ppg >> x[i].apg >> x[i].rpg;
+		i++;
+		//numofplayers++;
+	}
+
+} // end readin
+
+
+
+void printall ()
+{
+	//Prints all of the players from the list
+	cout << setw(8) << "First" << setw(8) << "Last" << setw(10) << "Team" << setw(5) << "PPG" 
+		<< setw(5) << "APG" << setw(5) << "RPG" << endl;
+	cout << setfill('-') << setw(41) << "-" << setfill (' ') << endl;
+
+	for (int i = 0; i < numofplayers; i++)
+		cout << setw(8) << x[i].firstname << setw(8) << x[i].lastname << setw(10) << x[i].team 
+		<< setw(5) << x[i].ppg << setw(5) << x[i].apg << setw(5) << x[i].rpg << endl;
+}
+
+
+void printone (int z)
+{
+	//Prints one player from the list based on user input
+	cout << setw(8) << "First" << setw(8) << "Last" << setw(10) << "Team" << setw(5) << "PPG" 
+		<< setw(5) << "APG" << setw(5) << "RPG" << endl;
+	cout << setfill('-') << setw(41) << "-" << setfill (' ') << endl;
+
+	cout << setw(8) << x[z].firstname << setw(8) << x[z].lastname << setw(10) << x[z].team 
+		<< setw(5) << x[z].ppg << setw(5) << x[z].apg << setw(5) << x[z].rpg << endl;
+}
+
+void menu ()
+{
+	//Menu for the user
+	cout << "Please pick one of the following options: " << endl;
+	cout << "1 - Print out all user and statistics" << endl;
+	cout << "2 - Print out the statistics of a specific player" << endl;
+	cout << "3 - Print out all data for a specific team" << endl;
+	cout << "4 - Update the data for a particular player" << endl;
+	cout << "5 - Exit program" << endl;
+} 
+
+
+void players ()
+{
+	//Allows the user to select a player from the selected list
+	//Calls another function to print that player and their statistics
+	int j=1;
+	int c=0;
+
+	cout << "Please select one palyer from the list by entering a number 1-10" << endl;
+	for (int i=0; i < numofplayers; i++)
+	{
+		cout << j << " - " << x[i].firstname << " " << x[i].lastname << endl;
+		j++;
+	} // end for loop
+
+	cin >> c;
+	c=c-1;
+
+	printone (c);
+} //end players
+
+void terminate (ofstream& outfile)
+{
+	//Terminates the loop and ends the program
+	char yesno;
+	cout << "Would you like to output your data to a file before the program closes? (Y/N)" << endl;
+	cin >> yesno;
+	if (yesno == 'Y' || yesno == 'y')
+	{
+		output(outfile);
+	}
+	else 
+		cout << "Thank you for using this program." << endl;
+} // end terminate
+
+void output (ofstream& outfile)
+{
+	//Outputs all data into a file
+	outfile << setw(8) << "First" << setw(8) << "Last" << setw(10) << "Team" << setw(5) << "PPG" 
+	<< setw(5) << "APG" << setw(5) << "RPG" << endl;
+	outfile << setfill('-') << setw(41) << "-" << setfill (' ') << endl;
+
+	for (int i = 0; i < numofplayers; i++)
+		outfile << setw(8) << x[i].firstname << setw(8) << x[i].lastname << setw(10) << x[i].team 
+		<< setw(5) << x[i].ppg << setw(5) << x[i].apg << setw(5) << x[i].rpg << endl;
+}
+
+void teamsearch ()
+{
+	//Searches for a team based on the user input. Finds all players 
+	//on the team specified
+	bool index[numofplayers]={0};
+	string inteam;
+	bool found = false;
+	int loc=0;
+
+	cout << "Which team would you like to see data for?" << endl;
+	cout << "Please enter \"Heat\" for the Miami Heat etc..." << endl;
+	cin >> inteam;
+
+	while (loc < numofplayers && !found)
+		if(x[loc].team == inteam)
+			found = true;
+		else
+			loc++;
+
+	if(found)
+	{
+
+	for (int i = 0; i < numofplayers; i++)
+	{
+		if (inteam==x[i].team)
+			index[i]=true;
+	}
+
+		cout << setw(8) << "First" << setw(8) << "Last" << setw(10) << "Team" << setw(5) << "PPG" 
+		<< setw(5) << "APG" << setw(5) << "RPG" << endl;
+		cout << setfill('-') << setw(41) << "-" << setfill (' ') << endl;
+
+	for (int i = 0; i < numofplayers; i++)
+		if (index[i] == true)
+			cout << setw(8) << x[i].firstname << setw(8) << x[i].lastname << setw(10) << x[i].team 
+			<< setw(5) << x[i].ppg << setw(5) << x[i].apg << setw(5) << x[i].rpg << endl;
+	}
+	else 
+		cout << "No player on that team is in this database." << endl;
+}
+
+void update ()
+{
+	//Allows the user to update a players statistics
+	int j=1;
+	int choice=0;
+	int choice2=0;
+
+	cout << "Please enter the number for the player you wish to update the data for." << endl;
+
+		for (int i = 0; i < numofplayers; i++)
+		{
+			cout << j << ". " << x[i].firstname << " " << x[i].lastname << endl;
+			j++;
+		}
+
+		cin >> choice;
+		cout << endl << "What would you like to modify about this player?" << endl;
+
+		cout << "1. Team" << endl;
+		cout << "2. PPG" << endl;
+		cout << "3. APG" << endl;
+		cout << "4. RPG" << endl;
+
+		cin >> choice2;
+
+		switch (choice2)
+		{
+			case 1:
+				{
+					cout << "Please enter the new team of the player." << endl;
+					cin >> x[choice-1].team;
+					break;
+				}
+			case 2:
+				{
+					cout << "Please enter the updated Points Per Game for the player." << endl;
+					cin >> x[choice-1].ppg;
+					break;
+				}
+			case 3:
+				{
+					cout << "Please enter the updated Assists Per Game for the player." << endl;
+					cin >> x[choice-1].apg;
+					break;
+				}
+			case 4:
+				{
+					cout << "Please enter the updated Rebounds Per Game for the player." << endl;
+					cin >> x[choice-1].rpg;
+					break;
+				}
+		}
+}
